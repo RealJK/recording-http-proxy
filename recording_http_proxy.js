@@ -91,8 +91,13 @@ function getFileSystemUrl(cacheDirectory, requestObj, remoteIpAddress) {
 	}
 
 	var fullPath = path.normalize(util.format("%s/%s/%s/%s/%s/%s.%s",
-		cacheDirectory, remoteIpAddress, protocol,
-		requestObj['hostname'], port, moment().format(timestampFormat), pathname));
+		cacheDirectory,
+		remoteIpAddress,
+		protocol,
+		requestObj['hostname'],
+		port,
+		pathname,
+		moment().format(timestampFormat)));
 
 	return fullPath;
 }

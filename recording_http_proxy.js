@@ -118,16 +118,18 @@ function doInternalProxy(incomingMessage, cacheDirectory, response) {
 	var options = {
 		hostname: requestObj['hostname'],
 		port: requestObj['port'],
-		path: requestObj['pathname'],
+		path: requestObj['path'],
 		method: incomingMessage.method,
 		headers: incomingMessage['headers']
 	}
+
+	var clientIp = incomingMessage.connection.remoteAddress;
 
 	var proxyRequest = http.request(options, function(proxyResponse) {
 
 		// Step 3: Figure out the file URL to save the asset to
 		var fileUrl = getFileSystemUrl(cacheDirectory, requestObj,
-			incomingMessage.connection.remoteAddress);
+			clientIp);
 		logger.debug("[" + incomingMessage.url + "] -> " + fileUrl);
 
 		// Should we save this HTTP asset

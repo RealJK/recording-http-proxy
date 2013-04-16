@@ -9,9 +9,10 @@ multiple requests for www.domain.com/crossdomain.xml will result to different fi
 troubleshooting binary files (for text, just use fiddler/firebug, etc).
 
 The output folder looks like:
-
 {client-ip}/
   http /
     www.domain.com /
       crossdomain.xml.2013-04-09T15-04-37-033
       crossdomain.xml.2013-04-09T15-04-46-493
+
+*At this point, HTTPS is not supported.

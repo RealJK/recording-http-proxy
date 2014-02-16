@@ -1,12 +1,11 @@
 recording-http-proxy
 ====================
 
-Based on NodeJS, this proxy will do as what it says.  Proxy HTTP requests between the proxy and the servers
-that it wish to talks to.
+HTTP proxy that saves all the files that it proxied (suffixed with timestamp) into the file system.  Great for debugging on the server-side.  It's like Fiddler for the server - best to capture binary files, or debugging server components.
 
-Also, it will save each of the responses into the output directory (suffixed by the timestamp).  Therefore,
-multiple requests for www.domain.com/crossdomain.xml will result to different files.  This is good for
-troubleshooting binary files (for text, just use fiddler/firebug, etc).
+Example, multiple requests for www.domain.com/crossdomain.xml will result to different files.
+
+<pre>
 
 The output folder looks like:
 {client-ip}/
@@ -15,4 +14,4 @@ The output folder looks like:
       crossdomain.xml.2013-04-09T15-04-37-033
       crossdomain.xml.2013-04-09T15-04-46-493
 
-*At this point, HTTPS is not supported.
+</pre>

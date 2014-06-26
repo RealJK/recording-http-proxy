@@ -151,20 +151,22 @@ function doInternalProxyRequest(incomingMessage, requestObj, response,
 	// Step 2: Write out the HTTP status code and headers
 	response.writeHead(proxyResponse.statusCode, proxyResponse.headers);
 
+	var chunksize = 0
 	// Step 3: Serve the chunk and close connection
 	proxyResponse.on("data", function(chunk) {
 		response.write(chunk, 'binary');
 		if (saveToDisk) fh.write(chunk);
+		chunksize += chunk.length
 	}).on("end", function() {
 		response.end();
 		if (saveToDisk) fh.end();
 		if (saveToDisk) fh.destroy();
-		doAccessLog(cacheDirectory, clientIp, proxyResponse.statusCode, incomingMessage.url, fileUrl)
+		doAccessLog(cacheDirectory, clientIp, proxyResponse.statusCode, incomingMessage.url, fileUrl, chunksize)
 	}).on("close", function() {
 		response.end();
 		if (saveToDisk) fh.end();
 		if (saveToDisk) fh.destroy();
-		doAccessLog(cacheDirectory, clientIp, proxyResponse.statusCode, incomingMessage.url, fileUrl)
+		doAccessLog(cacheDirectory, clientIp, proxyResponse.statusCode, incomingMessage.url, fileUrl, chunksize)
 	});
 };
 
@@ -175,21 +177,13 @@ function doInternalProxyRequest(incomingMessage, requestObj, response,
  * @param statusCode
  * @param url
  * @param fileUrl
+ * @param fileSize
  */
-function doAccessLog(cacheDirectory, clientIp, statusCode, url, fileUrl) {
+function doAccessLog(cacheDirectory, clientIp, statusCode, url, fileUrl, fileSize) {
 
 	var statsPath = path.normalize(util.format("%s/%s/access_log.txt", cacheDirectory, clientIp))
 	fs.appendFile(statsPath, util.format("[%s] - %s - %s - %s - %s\n",
-		moment().format(logTimestampFormat), statusCode, getFileSize(fileUrl), url, fileUrl.replace(cacheDirectory, '')))
-}
-
-/**
- * Return the size for a given file.
- * @param filename
- */
-function getFileSize(filename) {
-	var stats = fs.statSync(filename)
-	return stats["size"]
+		moment().format(logTimestampFormat), statusCode, fileSize, url, fileUrl.replace(cacheDirectory, '')))
 }
 
 /**

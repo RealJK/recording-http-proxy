@@ -73,6 +73,7 @@ logger.setLevel(cli.debug ? 'DEBUG' : 'ERROR');
 /// FUNCTIONS //////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+var logTimestampFormat = "YYYY-MM-DD HH:mm:ss.SSS";
 var timestampFormat = "YYYY-MM-DDTHH-mm-ss-SSS";
 
 /**
@@ -158,12 +159,38 @@ function doInternalProxyRequest(incomingMessage, requestObj, response,
 		response.end();
 		if (saveToDisk) fh.end();
 		if (saveToDisk) fh.destroy();
+		doAccessLog(cacheDirectory, clientIp, proxyResponse.statusCode, incomingMessage.url, fileUrl)
 	}).on("close", function() {
 		response.end();
 		if (saveToDisk) fh.end();
 		if (saveToDisk) fh.destroy();
+		doAccessLog(cacheDirectory, clientIp, proxyResponse.statusCode, incomingMessage.url, fileUrl)
 	});
 };
+
+/**
+ * Save the access log entry.
+ * @param cacheDirectory
+ * @param clientIp
+ * @param statusCode
+ * @param url
+ * @param fileUrl
+ */
+function doAccessLog(cacheDirectory, clientIp, statusCode, url, fileUrl) {
+
+	var statsPath = path.normalize(util.format("%s/%s/access_log.txt", cacheDirectory, clientIp))
+	fs.appendFile(statsPath, util.format("[%s] - %s - %s - %s - %s\n",
+		moment().format(logTimestampFormat), statusCode, getFileSize(fileUrl), url, fileUrl.replace(cacheDirectory, '')))
+}
+
+/**
+ * Return the size for a given file.
+ * @param filename
+ */
+function getFileSize(filename) {
+	var stats = fs.statSync(filename)
+	return stats["size"]
+}
 
 /**
  * doInternalProxy
